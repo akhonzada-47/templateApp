@@ -8,7 +8,7 @@ import {
   Get,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UpdateUserDto } from './dtos/updateUserDto';
+import { UpdateUserPasswordDto } from './dtos/updateUserDto';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -35,16 +35,16 @@ export class UserController {
   @ApiOperation({ summary: 'Update user password by Id' })
   updateUser(
     @Param('id') userId: number,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateUserPasswordDto: UpdateUserPasswordDto,
   ): Promise<any> {
-    return this.UserService.updateUserPassword(userId, updateUserDto);
+    return this.UserService.updateUserPassword(userId, updateUserPasswordDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @Delete(':id')
   @ApiOperation({ summary: 'Delete user by Id' })
-  deleteUser(@Param('id') userId: string): Promise<any> {
+  deleteUser(@Param('id') userId: number): Promise<any> {
     return this.UserService.deleteUser(userId);
   }
 }
