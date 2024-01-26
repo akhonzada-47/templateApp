@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dtos/createUserDto';
-import { UpdateUserDto } from './dtos/updateUserDto';
+import { UpdateUserPasswordDto } from './dtos/updateUserDto';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
@@ -33,36 +33,36 @@ export class UserService {
     return user;
   }
 
-  async updateUserPassword(userId: number, updateUserDto: UpdateUserDto) {
-    try {
-      await this.prismaService.user.update({
+  async updateUserPassword(userId: number, updateUserPasswordDto: UpdateUserPasswordDto) {
+    
+    if(updateUserPasswordDto.password !== updateUserPasswordDto.confirmPassword){
+      throw new BadRequestException("New/Confirm Password doesnt match");
+    } 
+
+    const user = await this.prismaService.user.update({
         where: {
           id: userId,
         },
         data: {
-          password: await bcrypt.hash(updateUserDto.password, 10),
+          password: await bcrypt.hash(updateUserPasswordDto.password, 10),
         },
       });
 
       return { message: 'User updated successfully' };
-    } catch (err) {
-      throw err.message;
-    }
+    
   }
 
-  async deleteUser(userId: string) {
+  async deleteUser(userId: number) {
     try {
-      const userIdInt = parseInt(userId, 10);
-
       await this.prismaService.user.delete({
         where: {
-          id: userIdInt,
+          id: userId,
         },
       });
 
       return { message: 'User deleted successfully' };
     } catch (err) {
-      throw new BadRequestException(err.message);
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
   }
 
@@ -81,7 +81,7 @@ export class UserService {
     ) {
       user = await this.findUserByEmail(credentials.email);
       if (!user) {
-        throw new NotFoundException('Email is incorrect');
+        throw new NotFoundException('Email not found');
       }
       const isMatch = await bcrypt.compare(credentials.password, user.password);
       if (!isMatch) {
