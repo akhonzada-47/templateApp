@@ -21,8 +21,9 @@ export class AuthService {
 
   async login(user: User): Promise<{ accessToken: string }> {
     const payload = {
+      id : user.id,
       email: user.email,
-      password: user.password,
+      role: user.role,
     };
 
     const accessToken = this.jwtService.sign(payload);
@@ -42,6 +43,7 @@ export class AuthService {
       data: {
         email: createUserDto.email,
         password: hashedPassword,
+        role:createUserDto.role,
       },
     });
     return createdUser;
