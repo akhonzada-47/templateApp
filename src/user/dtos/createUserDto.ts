@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Roles } from '@prisma/client';
 import { IsEmail, IsString, Length } from 'class-validator';
 
 export class CreateUserDto {
@@ -16,4 +17,8 @@ export class CreateUserDto {
   @IsString()
   @Length(8, 255)
   confirmPassword: string;
+
+  @ApiProperty()
+  @IsString()
+  role: Roles
 }
