@@ -11,25 +11,33 @@ import { UserService } from './user.service';
 import { UpdateUserPasswordDto } from './dtos/updateUserDto';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from '../auth/roles.guard'; // Import your RolesGuard
+import { Roles } from '../auth/roles.decorator';
 
+
+@UseGuards(RolesGuard) 
 @Controller('users')
 @ApiTags('Users')
 export class UserController {
   constructor(private readonly UserService: UserService) {}
 
+  @Roles('User')
+  @ApiBearerAuth()
   @Get(':id')
   @ApiOperation({ summary: 'Get user by Id' })
   getUserById(@Param('id') userId: string): Promise<any> {
     return this.UserService.getUserById(userId);
   }
 
+  @Roles('User') 
+  @ApiBearerAuth()
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   getAllUser() {
     return this.UserService.getAllUser();
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @Roles('User') 
   @ApiBearerAuth()
   @Patch(':id')
   @ApiOperation({ summary: 'Update user password by Id' })
@@ -40,6 +48,7 @@ export class UserController {
     return this.UserService.updateUserPassword(userId, updateUserPasswordDto);
   }
 
+  @Roles('Admin')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @Delete(':id')
