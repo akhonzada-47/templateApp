@@ -1,25 +1,27 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from '../env.validation';
-
-
-
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
-    private readonly reflector: Reflector, 
-    private jwtService: JwtService, 
+    private readonly reflector: Reflector,
+    private jwtService: JwtService,
     private readonly configService: ConfigService<EnvironmentVariables>,
-    ) {}
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const roles = this.reflector.get<string>('roles', context.getHandler());
-    
+
     if (!roles) {
-      return true; 
+      return true;
     }
 
     const request = context.switchToHttp().getRequest();
@@ -30,37 +32,22 @@ export class RolesGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(
-        token,
-        {
-          secret : this.configService.get('JWT_SECRET')
-        }
-      );
-     
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: this.configService.get('JWT_SECRET'),
+      });
+
       request['user'] = payload;
 
       const user = request.user;
       return roles.includes(user.role);
-
     } catch {
       throw new UnauthorizedException();
     }
-    
   }
-
-
-
-
-
-
-
-
-
-
 
   private extractTokenFromHeader(request: any): string | undefined {
     const authorizationHeader = request.headers.authorization;
-    
+
     if (!authorizationHeader) {
       return authorizationHeader;
     }
@@ -69,6 +56,4 @@ export class RolesGuard implements CanActivate {
 
     return type === 'Bearer' ? token : undefined;
   }
-  
-
 }

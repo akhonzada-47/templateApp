@@ -1,13 +1,12 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
-  BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateUserDto } from './dtos/createUserDto';
-import { UpdateUserPasswordDto } from './dtos/updateUserDto';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from '../prisma/prisma.service';
+import { UpdateUserPasswordDto } from './dtos/updateUserDto';
 
 @Injectable()
 export class UserService {
@@ -33,23 +32,26 @@ export class UserService {
     return user;
   }
 
-  async updateUserPassword(userId: number, updateUserPasswordDto: UpdateUserPasswordDto) {
-    
-    if(updateUserPasswordDto.password !== updateUserPasswordDto.confirmPassword){
-      throw new BadRequestException("New/Confirm Password doesnt match");
-    } 
+  async updateUserPassword(
+    userId: number,
+    updateUserPasswordDto: UpdateUserPasswordDto,
+  ) {
+    if (
+      updateUserPasswordDto.password !== updateUserPasswordDto.confirmPassword
+    ) {
+      throw new BadRequestException('New/Confirm Password doesnt match');
+    }
 
     const user = await this.prismaService.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          password: await bcrypt.hash(updateUserPasswordDto.password, 10),
-        },
-      });
+      where: {
+        id: userId,
+      },
+      data: {
+        password: await bcrypt.hash(updateUserPasswordDto.password, 10),
+      },
+    });
 
-      return { message: 'User is updated successfully' };
-    
+    return { message: 'User is updated successfully' };
   }
 
   async deleteUser(userId: number) {
@@ -60,7 +62,7 @@ export class UserService {
         },
       });
 
-      return { message: 'User deleted successfully' };
+      return { message: 'User is deleted successfully' };
     } catch (err) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }

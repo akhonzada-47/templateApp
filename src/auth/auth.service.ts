@@ -1,15 +1,11 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
-import { UserService } from '../user/user.service';
-import { LoginUserDto } from 'src/user/dtos/loginUserDto';
-import { CreateUserDto } from '../user/dtos/createUserDto';
 import * as bcrypt from 'bcrypt';
+import { LoginUserDto } from 'src/user/dtos/loginUserDto';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateUserDto } from '../user/dtos/createUserDto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +17,7 @@ export class AuthService {
 
   async login(user: User): Promise<{ accessToken: string }> {
     const payload = {
-      id : user.id,
+      id: user.id,
       email: user.email,
       role: user.role,
     };
@@ -43,7 +39,7 @@ export class AuthService {
       data: {
         email: createUserDto.email,
         password: hashedPassword,
-        role:createUserDto.role,
+        role: createUserDto.role,
       },
     });
     return createdUser;

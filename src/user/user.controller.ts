@@ -1,21 +1,20 @@
 import {
   Body,
   Controller,
-  UseGuards,
-  Param,
-  Patch,
   Delete,
   Get,
+  Param,
+  Patch,
+  UseGuards,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { UpdateUserPasswordDto } from './dtos/updateUserDto';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from '../auth/roles.guard'; // Import your RolesGuard
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard'; // Import your RolesGuard
+import { UpdateUserPasswordDto } from './dtos/updateUserDto';
+import { UserService } from './user.service';
 
-
-@UseGuards(RolesGuard) 
+@UseGuards(RolesGuard)
 @Controller('users')
 @ApiTags('Users')
 export class UserController {
@@ -29,7 +28,7 @@ export class UserController {
     return this.UserService.getUserById(userId);
   }
 
-  @Roles('User') 
+  @Roles('User')
   @ApiBearerAuth()
   @Get()
   @ApiOperation({ summary: 'Get all users' })
@@ -37,7 +36,7 @@ export class UserController {
     return this.UserService.getAllUser();
   }
 
-  @Roles('User') 
+  @Roles('User')
   @ApiBearerAuth()
   @Patch(':id')
   @ApiOperation({ summary: 'Update user password by Id' })
