@@ -48,7 +48,7 @@ export class UserService {
         },
       });
 
-      return { message: 'User updated successfully' };
+      return { message: 'User is updated successfully' };
     
   }
 
