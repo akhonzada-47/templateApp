@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Patch,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -12,6 +13,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard'; // Import your RolesGuard
 import { UpdateUserPasswordDto } from './dtos/updateUserDto';
+import { GetUser } from './get-user.decorator';
 import { UserService } from './user.service';
 
 @UseGuards(RolesGuard)
@@ -22,9 +24,9 @@ export class UserController {
 
   @Roles('User')
   @ApiBearerAuth()
-  @Get(':id')
+  @Get('getUserById')
   @ApiOperation({ summary: 'Get user by Id' })
-  getUserById(@Param('id') userId: string): Promise<any> {
+  getUserById(@Query('id') userId: string): Promise<any> {
     return this.UserService.getUserById(userId);
   }
 
@@ -32,16 +34,16 @@ export class UserController {
   @ApiBearerAuth()
   @Get()
   @ApiOperation({ summary: 'Get all users' })
-  getAllUser() {
-    return this.UserService.getAllUser();
+  getAllUser(@GetUser() user) {
+    return this.UserService.getAllUser(user.userId);
   }
 
   @Roles('User')
   @ApiBearerAuth()
-  @Patch(':id')
+  @Patch('updatePassword')
   @ApiOperation({ summary: 'Update user password by Id' })
   updateUser(
-    @Param('id') userId: number,
+    @Query('id') userId: number,
     @Body() updateUserPasswordDto: UpdateUserPasswordDto,
   ): Promise<any> {
     return this.UserService.updateUserPassword(userId, updateUserPasswordDto);
@@ -50,9 +52,9 @@ export class UserController {
   @Roles('Admin')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @Delete(':id')
+  @Delete('deleteUser')
   @ApiOperation({ summary: 'Delete user by Id' })
-  deleteUser(@Param('id') userId: number): Promise<any> {
+  deleteUser(@Query('id') userId: number): Promise<any> {
     return this.UserService.deleteUser(userId);
   }
 }

@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
@@ -10,10 +11,17 @@ import { UpdateUserPasswordDto } from './dtos/updateUserDto';
 
 @Injectable()
 export class UserService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private scheduleRegistry: SchedulerRegistry,
+  ) {}
 
-  async getAllUser() {
-    const user = await this.prismaService.user.findMany();
+  async getAllUser(userid: number) {
+    const user = await this.prismaService.user.findMany({
+      where: {
+        id: userid,
+      },
+    });
     return user;
   }
 
@@ -103,4 +111,9 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
   }
+
+  // @Cron(CronExpression.EVERY_10_SECONDS)
+  // triggerTask() {
+  //   console.log('Hello, \nIm recurring after every 10 seconds');
+  // }
 }

@@ -9,7 +9,7 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('signUp')
+  @Post('signup')
   @ApiOperation({ summary: 'Create User' })
   signUp(@Body() createUser: CreateUserDto): Promise<any> {
     return this.authService.createUser(createUser);
