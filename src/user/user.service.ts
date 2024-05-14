@@ -112,8 +112,8 @@ export class UserService {
     }
   }
 
-  // @Cron(CronExpression.EVERY_10_SECONDS)
-  // triggerTask() {
-  //   console.log('Hello, \nIm recurring after every 10 seconds');
-  // }
+  @Cron('* 1 * * * *')
+  triggerTask() {
+    console.log('Hello, \nIm recurring after every 10 seconds');
+  }
 }
